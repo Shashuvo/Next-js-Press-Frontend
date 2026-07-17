@@ -1,6 +1,6 @@
 import React from 'react';
 
-const page = () => {
+const Slug = () => {
     return (
         <div>
             <h1>Slug page</h1>
@@ -8,4 +8,4 @@ const page = () => {
     );
 };
 
-export default page;
+export default Slug;

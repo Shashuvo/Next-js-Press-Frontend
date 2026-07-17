@@ -1,11 +1,11 @@
-import React from 'react';
+import React from 'react'
 
-const page = () => {
-    return (
-        <div>
-            <h1>authors</h1>
-        </div>
-    );
-};
+const Authors = () => {
+  return (
+    <div>
+      <h1>Authors</h1>
+    </div>
+  )
+}
 
-export default page;
+export default Authors;
