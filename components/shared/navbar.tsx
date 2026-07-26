@@ -43,13 +43,36 @@ const userMenuItems = [
     { label: "Support", icon: LifeBuoy },
 ]
 
-const user = {
-    name: "Alex Morgan",
-    email: "alex@acme.com",
-    avatar: "/diverse-avatars.png",
+type IUser = {
+    success: boolean,
+    statusCode: number,
+    message: string,
+    data: {
+        profile: {
+            id: string,
+            name: string,
+            email: string,
+            activeStatus: string,
+            role: string,
+            createdAt: string,
+            updatedAt: string,
+            profile: {
+                id: string,
+                profilePhoto: string,
+                bio: string | null,
+                userId: string,
+                createdAt: string,
+                updatedAt: string,
+            }
+        }
+    }
 }
 
-export function Navbar() {
+type NavbarProps = {
+    user: IUser
+}
+
+export function Navbar({ user }: NavbarProps) {
     const [activeHref, setActiveHref] = useState("/")
     const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -102,9 +125,9 @@ export function Navbar() {
                                 aria-label="Open user menu"
                             >
                                 <Avatar className="size-9">
-                                    <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
+                                    <AvatarImage src={user.data?.profile.profile.profilePhoto || "/placeholder.svg"} alt={user.data?.profile.name} />
                                     <AvatarFallback>
-                                        {user.name
+                                        {user.data?.profile.name || "John Doe"
                                             .split(" ")
                                             .map((n) => n[0])
                                             .join("")}
@@ -116,8 +139,8 @@ export function Navbar() {
                             <DropdownMenuGroup>
                                 <DropdownMenuLabel>
                                     <div className="flex flex-col gap-0.5">
-                                        <span className="text-sm font-medium text-foreground">{user.name}</span>
-                                        <span className="text-xs font-normal text-muted-foreground">{user.email}</span>
+                                        <span className="text-sm font-medium text-foreground">{user.data?.profile.name || "John Doe"}</span>
+                                        <span className="text-xs font-normal text-muted-foreground">{user.data?.profile.email || "JohnDoe@email.com"}</span>
                                     </div>
                                 </DropdownMenuLabel>
                             </DropdownMenuGroup>

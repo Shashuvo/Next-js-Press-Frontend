@@ -10,7 +10,7 @@ export const getMe = async () => {
     if (!accessToken) {
         return {
             success: false,
-            message: "User not logged in!"
+            message: "User not logged in! Please login."
         }
     }
 
