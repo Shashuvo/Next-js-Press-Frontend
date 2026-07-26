@@ -1,7 +1,13 @@
+import { getMe } from "@/service/getMe";
 
-export default function HomePage() {
-  return(
-    
+export default async function HomePage() {
+
+
+  const user = await getMe();
+  console.log(user)
+
+  return (
+
     <div>Hello nexjs</div>
   );
 }
