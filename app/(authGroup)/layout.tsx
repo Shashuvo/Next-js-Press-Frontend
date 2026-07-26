@@ -7,7 +7,7 @@ const AuthLayout = async (
 
     const user = await getMe();
     return (
-        <div className='max-w-8xl mx-auto'>
+        <div>
             <Navbar user={user}></Navbar>
             {children}
         </div>

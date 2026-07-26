@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
     LayoutDashboard,
     FolderKanban,
@@ -28,6 +28,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
+import { logout } from "@/service/logout"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 const navItems = [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -75,6 +78,24 @@ type NavbarProps = {
 export function Navbar({ user }: NavbarProps) {
     const [activeHref, setActiveHref] = useState("/")
     const [mobileOpen, setMobileOpen] = useState(false)
+    // const [isLogout, setIsLogout] = useState(false)
+    const router = useRouter()
+
+    const handleUserMenuAction = async (action: string) => {
+        if (action === "logout") {
+            await logout();
+            // setIsLogout(true);
+            toast.success("User logged out successfully.")
+            router.push("/login")
+        }
+    }
+
+    // useEffect(() => {
+    //     if (isLogout) {
+    //         toast.success("User logged out successfully.")
+    //         router.push("/login")
+    //     }
+    // }, [isLogout, router])
 
     return (
         <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
@@ -117,52 +138,60 @@ export function Navbar({ user }: NavbarProps) {
 
                 {/* Right side: user dropdown + mobile toggle */}
                 <div className="flex items-center gap-2">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                className="relative size-9 rounded-full p-0"
-                                aria-label="Open user menu"
-                            >
-                                <Avatar className="size-9">
-                                    <AvatarImage src={user.data?.profile.profile.profilePhoto || "/placeholder.svg"} alt={user.data?.profile.name} />
-                                    <AvatarFallback>
-                                        {user.data?.profile.name || "John Doe"
-                                            .split(" ")
-                                            .map((n) => n[0])
-                                            .join("")}
-                                    </AvatarFallback>
-                                </Avatar>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56">
-                            <DropdownMenuGroup>
-                                <DropdownMenuLabel>
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-sm font-medium text-foreground">{user.data?.profile.name || "John Doe"}</span>
-                                        <span className="text-xs font-normal text-muted-foreground">{user.data?.profile.email || "JohnDoe@email.com"}</span>
-                                    </div>
-                                </DropdownMenuLabel>
-                            </DropdownMenuGroup>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuGroup>
-                                {userMenuItems.map((item) => {
-                                    const Icon = item.icon
-                                    return (
-                                        <DropdownMenuItem key={item.label} onClick={() => console.log("[v0] menu:", item.label)}>
-                                            <Icon />
-                                            {item.label}
-                                        </DropdownMenuItem>
-                                    )
-                                })}
-                            </DropdownMenuGroup>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem variant="destructive" onClick={() => console.log("[v0] log out")}>
-                                <LogOut />
-                                Log out
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    {
+                        user.success ?
+                            (<DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        className="relative size-9 rounded-full p-0"
+                                        aria-label="Open user menu"
+                                    >
+                                        <Avatar className="size-9">
+                                            <AvatarImage src={user.data?.profile.profile.profilePhoto || "/placeholder.svg"} alt={user.data?.profile.name} />
+                                            <AvatarFallback>
+                                                {user.data?.profile.name || "John Doe"
+                                                    .split(" ")
+                                                    .map((n) => n[0])
+                                                    .join("")}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-56">
+                                    <DropdownMenuGroup>
+                                        <DropdownMenuLabel>
+                                            <div className="flex flex-col gap-0.5">
+                                                <span className="text-sm font-medium text-foreground">{user.data?.profile.name || "John Doe"}</span>
+                                                <span className="text-xs font-normal text-muted-foreground">{user.data?.profile.email || "JohnDoe@email.com"}</span>
+                                            </div>
+                                        </DropdownMenuLabel>
+                                    </DropdownMenuGroup>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuGroup>
+                                        {userMenuItems.map((item) => {
+                                            const Icon = item.icon
+                                            return (
+                                                <DropdownMenuItem key={item.label} onClick={() => console.log("[v0] menu:", item.label)}>
+                                                    <Icon />
+                                                    {item.label}
+                                                </DropdownMenuItem>
+                                            )
+                                        })}
+                                    </DropdownMenuGroup>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem variant="destructive" onClick={async () => {
+                                        await handleUserMenuAction("logout");
+                                    }}>
+                                        <LogOut />
+                                        Log out
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>) :
+                            <Link href={"/login"}>
+                                <Button>Login</Button>
+                            </Link>
+                    }
 
                     <Button
                         variant="ghost"
