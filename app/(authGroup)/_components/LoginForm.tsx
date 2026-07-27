@@ -24,8 +24,8 @@ const LoginForm = () => {
     return (
         <form action={action} className="space-y-4">
             <Card className="p-5 space-y-4">
-                <input type="email" name="email" placeholder="Enter Your Email" required />
-                <input type="password" name="password" placeholder="Enter Your Password" required />
+                <input className="p-3 rounded-4xl bg-gray-200" type="email" name="email" placeholder="Enter Your Email" required />
+                <input className="p-3 rounded-4xl bg-gray-200" type="password" name="password" placeholder="Enter Your Password" required />
                 <Button type="submit">
                     {
                         pending ? "Submitting..." : "Login"
