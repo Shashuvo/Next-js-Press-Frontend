@@ -20,6 +20,8 @@ export function proxy(request: NextRequest) {
         userRole = decodedToken.role;
     }
 
+    
+
     // user is logged in but trying to access login or register, then redirect to their role dashboard or home page
     if (accessToken && AUTH_ROUTES.includes(pathName)) {
         if (userRole === "USER") {
@@ -54,7 +56,7 @@ export function proxy(request: NextRequest) {
     else if (pathName.startsWith("/author-dashboard") && userRole !== "AUTHOR") {
         return NextResponse.redirect(new URL('/not-found', request.url));
     }
-
+ 
     // return NextResponse.redirect(new URL('/', request.url))
     return NextResponse.next();
 }
