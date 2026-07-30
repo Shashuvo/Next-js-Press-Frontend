@@ -1,26 +1,33 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import jwt, { JwtPayload } from "jsonwebtoken"
+import { JwtPayload } from "jsonwebtoken"
+import { jwtUtils } from './utils/jwt';
+import { cookies } from 'next/headers';
 
 const AUTH_ROUTES = ["/login", "/register"];
 
 const PUBLIC_ROUTES = ["/", "/news"];
 
 // This function can be marked `async` if using `await` inside
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     const pathName = request.nextUrl.pathname;
+
+    const cookieStore = await cookies();
 
     const accessToken = request.cookies.get("accessToken")?.value;
 
-    const decodedToken = accessToken ? jwt.decode(accessToken) as JwtPayload : null;
+    const decodedToken = accessToken ? jwtUtils.verifyToken(accessToken, process.env.JWT_ACCESS_SECRET as string) : null;
 
     let userRole = null;
 
-    if (decodedToken) {
-        userRole = decodedToken.role;
+    if (!decodedToken?.success) {
+        cookieStore.delete("accessToken");
+        return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    
+    if (decodedToken?.success && decodedToken.data) {
+        userRole = (decodedToken.data as JwtPayload).role;
+    }
 
     // user is logged in but trying to access login or register, then redirect to their role dashboard or home page
     if (accessToken && AUTH_ROUTES.includes(pathName)) {
@@ -56,7 +63,7 @@ export function proxy(request: NextRequest) {
     else if (pathName.startsWith("/author-dashboard") && userRole !== "AUTHOR") {
         return NextResponse.redirect(new URL('/not-found', request.url));
     }
- 
+
     // return NextResponse.redirect(new URL('/', request.url))
     return NextResponse.next();
 }
