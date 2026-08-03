@@ -37,11 +37,11 @@ export function NewsCard({ post }: NewsCardProps) {
                 Premium
               </Badge>
             )}
-            {/* {post.tags?.map((tag) => (
+            {post.tags?.map((tag) => (
               <Badge key={tag} variant="secondary">
                 {tag}
               </Badge>
-            ))} */}
+            ))}
           </div>
           <CardTitle className="text-lg">{post.title}</CardTitle>
         </CardHeader>

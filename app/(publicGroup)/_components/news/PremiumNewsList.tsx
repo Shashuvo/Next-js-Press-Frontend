@@ -1,30 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react'
 import { NewsCard } from './NewsCard'
 import { IPost } from '@/lib/types';
+import { getPremiumNews } from '../../_actions/getPremiumNews';
 
-const PremiumNewsList = () => {
+const PremiumNewsList = async () => {
 
-  
-  const result = {
-    success: true,
-    data: [
-      {
-        id: "2",
-        title: "premium News 1",
-        content: "This is the content of premium news 1.",
-        thumbnail: "https://via.placeholder.com/150",
-        isFeatured: true,
-        status: "PUBLISHED",
-        tags: ["tag1", "tag2"],
-        views: 100,
-        isPremium: true,
-        authorId: "1",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-    ]
-  };
+
+  const result = await getPremiumNews();
+
 
   if (!result.success || !result.data?.length) {
     return (
