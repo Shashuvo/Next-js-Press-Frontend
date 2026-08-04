@@ -14,18 +14,18 @@ export function NewsCard({ post }: NewsCardProps) {
 
     return (
       <Card className="gap-4">
-        {post.thumbnail && (
+        {post.thumbNail && (
           // <img
           //     src={post.thumbnail}
           //     alt={post.title}
           //     className="h-48 w-full object-cover"
           // />
           <Image
-            src={post.thumbnail}
+            src={post.thumbNail}
             unoptimized
             alt={post.title}
             width={400}
-            height={400}
+            height={300}
             // fill
           />
         )}
