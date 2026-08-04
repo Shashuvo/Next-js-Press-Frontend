@@ -29,7 +29,7 @@ export const getPremiumNews = async () => {
         }
     });
 
-    const result = res.json();
+    const result = await res.json();
     console.log("result",result, " this is the result")
     return result;
 
