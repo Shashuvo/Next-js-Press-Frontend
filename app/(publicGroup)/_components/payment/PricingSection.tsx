@@ -41,7 +41,7 @@ export async function PricingSection() {
                     </li>
                 </ul>
                 {!isActive && <SubscribeButton />}
-                {/* {<SubscribeButton />} */}
+                {<SubscribeButton />}
             </CardContent>
         </Card>
     );

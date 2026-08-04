@@ -5,11 +5,11 @@
 import { Button } from "@/components/ui/button";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
-// import { subscribePremium } from "../../_actions/subscribePremium";
+import { subscribePremium } from "../../_actions/subscribePremium";
+
 
 export function SubscribeButton() {
-    // const [state, action, pending] = useActionState(subscribePremium, null);
-    const [state, action, pending] = useActionState((): any => { }, null);
+    const [state, action, pending] = useActionState(subscribePremium, null);
 
     useEffect(() => {
         if (!state) return;
