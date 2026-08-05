@@ -11,7 +11,6 @@ export async function PricingSection() {
         statusResult?.success && statusResult.data?.isSubscribed
     );
 
-    console.log(statusResult.data.isSubscribed)
 
     return (
         <Card className="mx-auto max-w-md">
