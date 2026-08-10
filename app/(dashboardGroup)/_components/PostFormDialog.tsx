@@ -43,6 +43,8 @@ export function PostFormDialog({ mode, post }: PostFormDialogProps) {
         }
     }, [state, mode]);
 
+
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>

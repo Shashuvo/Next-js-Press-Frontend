@@ -11,6 +11,7 @@ type MyPostCardProps = {
 export function MyPostCard({ post }: MyPostCardProps) {
     const commentCount = post._count?.comments ?? post.comments?.length ?? 0;
 
+
     return (
         <Card>
             <CardHeader>
