@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { act, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import {
@@ -42,9 +42,9 @@ const navItems = [
 
 const userMenuItems = [
     { label: "Dashboard", icon: LayoutDashboard, action: "dashboard" },
-    { label: "Settings", icon: Settings, action: "settings" },
-    { label: "Billing", icon: CreditCard, action: "payment" },
+    { label: "Payment", icon: CreditCard, action: "payment" },
     { label: "Support", icon: LifeBuoy, action: "support" },
+    { label: "Settings", icon: Settings, action: "settings" },
 ]
 
 export function Navbar({ user }: NavbarProps) {
@@ -67,6 +67,10 @@ export function Navbar({ user }: NavbarProps) {
             await logout()
             toast.success("User logged out successfully.")
             router.push("/login")
+        }
+
+        if (action === "payment") {
+            router.push("/payment");
         }
     }
 
