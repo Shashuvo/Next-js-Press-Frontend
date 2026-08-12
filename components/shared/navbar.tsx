@@ -1,18 +1,20 @@
 "use client"
 
 import { useState } from "react"
+import { usePathname, useRouter } from "next/navigation"
+import Link from "next/link"
 import {
     LayoutDashboard,
-    FolderKanban,
-    Users,
     BarChart3,
-    User,
     Settings,
     CreditCard,
     LifeBuoy,
     LogOut,
     Menu,
     X,
+    House,
+    Crown,
+    Newspaper,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -27,75 +29,46 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
-import Link from "next/link"
 import { logout } from "@/service/logout"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
+import { NavbarProps } from "@/lib/types"
 
 const navItems = [
-    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { label: "Projects", href: "/projects", icon: FolderKanban },
-    { label: "Team", href: "/team", icon: Users },
+    { label: "Home", href: "/", icon: House },
+    { label: "Premium", href: "/premium", icon: Crown },
+    { label: "News", href: "/news", icon: Newspaper },
     { label: "Analytics", href: "/analytics", icon: BarChart3 },
 ]
 
 const userMenuItems = [
-    { label: "Profile", icon: User },
-    { label: "Settings", icon: Settings },
-    { label: "Billing", icon: CreditCard },
-    { label: "Support", icon: LifeBuoy },
+    { label: "Dashboard", icon: LayoutDashboard, action: "dashboard" },
+    { label: "Settings", icon: Settings, action: "settings" },
+    { label: "Billing", icon: CreditCard, action: "payment" },
+    { label: "Support", icon: LifeBuoy, action: "support" },
 ]
 
-type IUser = {
-    success: boolean,
-    statusCode: number,
-    message: string,
-    data: {
-        profile: {
-            id: string,
-            name: string,
-            email: string,
-            activeStatus: string,
-            role: string,
-            createdAt: string,
-            updatedAt: string,
-            profile: {
-                id: string,
-                profilePhoto: string,
-                bio: string | null,
-                userId: string,
-                createdAt: string,
-                updatedAt: string,
-            }
-        }
-    }
-}
-
-type NavbarProps = {
-    user: IUser
-}
-
 export function Navbar({ user }: NavbarProps) {
-    const [activeHref, setActiveHref] = useState("/")
     const [mobileOpen, setMobileOpen] = useState(false)
-    // const [isLogout, setIsLogout] = useState(false)
+    const pathname = usePathname()
     const router = useRouter()
 
     const handleUserMenuAction = async (action: string) => {
+        if (action === "dashboard") {
+            if (user.data?.profile.role === "USER") {
+                router.push("/dashboard")
+            } else if (user.data?.profile.role === "AUTHOR") {
+                router.push("/author-dashboard")
+            } else if (user.data?.profile.role === "ADMIN") {
+                router.push("/admin-dashboard")
+            }
+        }
+
         if (action === "logout") {
-            await logout();
-            // setIsLogout(true);
+            await logout()
             toast.success("User logged out successfully.")
             router.push("/login")
         }
     }
-
-    // useEffect(() => {
-    //     if (isLogout) {
-    //         toast.success("User logged out successfully.")
-    //         router.push("/login")
-    //     }
-    // }, [isLogout, router])
 
     return (
         <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
@@ -112,15 +85,11 @@ export function Navbar({ user }: NavbarProps) {
                 <ul className="hidden items-center gap-1 md:flex">
                     {navItems.map((item) => {
                         const Icon = item.icon
-                        const isActive = activeHref === item.href
+                        const isActive = pathname === item.href
                         return (
                             <li key={item.href}>
-                                <a
+                                <Link
                                     href={item.href}
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        setActiveHref(item.href)
-                                    }}
                                     className={cn(
                                         "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                                         isActive
@@ -130,7 +99,7 @@ export function Navbar({ user }: NavbarProps) {
                                 >
                                     <Icon className="size-4" />
                                     {item.label}
-                                </a>
+                                </Link>
                             </li>
                         )
                     })}
@@ -138,60 +107,73 @@ export function Navbar({ user }: NavbarProps) {
 
                 {/* Right side: user dropdown + mobile toggle */}
                 <div className="flex items-center gap-2">
-                    {
-                        user.success ?
-                            (<DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        className="relative size-9 rounded-full p-0"
-                                        aria-label="Open user menu"
-                                    >
-                                        <Avatar className="size-9">
-                                            <AvatarImage src={user.data?.profile.profile.profilePhoto || "/placeholder.svg"} alt={user.data?.profile.name} />
-                                            <AvatarFallback>
-                                                {user.data?.profile.name || "John Doe"
-                                                    .split(" ")
-                                                    .map((n) => n[0])
-                                                    .join("")}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56">
-                                    <DropdownMenuGroup>
-                                        <DropdownMenuLabel>
-                                            <div className="flex flex-col gap-0.5">
-                                                <span className="text-sm font-medium text-foreground">{user.data?.profile.name || "John Doe"}</span>
-                                                <span className="text-xs font-normal text-muted-foreground">{user.data?.profile.email || "JohnDoe@email.com"}</span>
-                                            </div>
-                                        </DropdownMenuLabel>
-                                    </DropdownMenuGroup>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuGroup>
-                                        {userMenuItems.map((item) => {
-                                            const Icon = item.icon
-                                            return (
-                                                <DropdownMenuItem key={item.label} onClick={() => console.log("[v0] menu:", item.label)}>
-                                                    <Icon />
-                                                    {item.label}
-                                                </DropdownMenuItem>
-                                            )
-                                        })}
-                                    </DropdownMenuGroup>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem variant="destructive" onClick={async () => {
-                                        await handleUserMenuAction("logout");
-                                    }}>
-                                        <LogOut />
-                                        Log out
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>) :
-                            <Link href={"/login"}>
-                                <Button>Login</Button>
-                            </Link>
-                    }
+                    {user.success ? (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    className="relative size-9 rounded-full p-0"
+                                    aria-label="Open user menu"
+                                >
+                                    <Avatar className="size-9">
+                                        <AvatarImage
+                                            src={user.data?.profile.profile.profilePhoto || "/placeholder.svg"}
+                                            alt={user.data?.profile.name}
+                                        />
+                                        <AvatarFallback>
+                                            {(user.data?.profile.name || "John Doe")
+                                                .split(" ")
+                                                .map((n) => n[0])
+                                                .join("")}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56">
+                                <DropdownMenuGroup>
+                                    <DropdownMenuLabel>
+                                        <div className="flex flex-col gap-0.5">
+                                            <span className="text-sm font-medium text-foreground">
+                                                {user.data?.profile.name || "John Doe"}
+                                            </span>
+                                            <span className="text-xs font-normal text-muted-foreground">
+                                                {user.data?.profile.email || "JohnDoe@email.com"}
+                                            </span>
+                                        </div>
+                                    </DropdownMenuLabel>
+                                </DropdownMenuGroup>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuGroup>
+                                    {userMenuItems.map((item) => {
+                                        const Icon = item.icon
+                                        return (
+                                            <DropdownMenuItem
+                                                key={item.action}
+                                                onClick={() => handleUserMenuAction(item.action)}
+                                            >
+                                                <Icon />
+                                                {item.label}
+                                            </DropdownMenuItem>
+                                        )
+                                    })}
+                                </DropdownMenuGroup>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    variant="destructive"
+                                    onClick={async () => {
+                                        await handleUserMenuAction("logout")
+                                    }}
+                                >
+                                    <LogOut />
+                                    Log out
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    ) : (
+                        <Link href={"/login"}>
+                            <Button>Login</Button>
+                        </Link>
+                    )}
 
                     <Button
                         variant="ghost"
@@ -212,16 +194,12 @@ export function Navbar({ user }: NavbarProps) {
                     <ul className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3 sm:px-6">
                         {navItems.map((item) => {
                             const Icon = item.icon
-                            const isActive = activeHref === item.href
+                            const isActive = pathname === item.href
                             return (
                                 <li key={item.href}>
-                                    <a
+                                    <Link
                                         href={item.href}
-                                        onClick={(e) => {
-                                            e.preventDefault()
-                                            setActiveHref(item.href)
-                                            setMobileOpen(false)
-                                        }}
+                                        onClick={() => setMobileOpen(false)}
                                         className={cn(
                                             "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                                             isActive
@@ -231,7 +209,7 @@ export function Navbar({ user }: NavbarProps) {
                                     >
                                         <Icon className="size-4" />
                                         {item.label}
-                                    </a>
+                                    </Link>
                                 </li>
                             )
                         })}
