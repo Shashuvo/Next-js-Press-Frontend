@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
+import { isAccessTokenExist } from "@/service/getNewAccessToken";
 import { revalidateTag } from "next/cache";
-import { cookies } from "next/headers";
 
 type PostState = {
     success: true,
@@ -30,19 +30,7 @@ export const createPost = async (prevState: PostState, formData: FormData) => {
         isPremium: formData.get("isPremium") === "on"
     }
 
-    const cookieStore = await cookies();
-
-    const accessToken = cookieStore.get("accessToken")?.value || null;
-    const refreshToken = cookieStore.get("refreshToken")?.value || null;
-
-    if (!accessToken && !refreshToken) {
-        // throw new Error("User Not Logged In!");
-
-        return {
-            success: false,
-            message: "User not logged in!"
-        }
-    }
+    const accessToken = await isAccessTokenExist();
 
     // const decodedAccessToken = accessToken ? jwtUtils.verifyToken(accessToken, process.env.JWT_ACCESS_SECRET as string) : null;
 
@@ -68,7 +56,6 @@ export const createPost = async (prevState: PostState, formData: FormData) => {
     //         }
     //     }
 
-    // const accessToken = await isAccessTokenExist()
 
 
 
@@ -127,19 +114,8 @@ export const updatePost = async (postId: string, prevState: PostState, formData:
         isPremium: formData.get("isPremium") === "on"
     }
 
-    const cookieStore = await cookies();
 
-    const accessToken = cookieStore.get("accessToken")?.value || null;
-    const refreshToken = cookieStore.get("refreshToken")?.value || null;
-
-    if (!accessToken && !refreshToken) {
-        // throw new Error("User Not Logged In!");
-
-        return {
-            success: false,
-            message: "User not logged in!"
-        }
-    }
+    const accessToken = await isAccessTokenExist();
 
     // const decodedAccessToken = accessToken ? jwtUtils.verifyToken(accessToken, process.env.JWT_ACCESS_SECRET as string) : null;
 
@@ -207,18 +183,7 @@ export const updatePost = async (postId: string, prevState: PostState, formData:
 }
 
 export const getMyPosts = async () => {
-    const cookieStore = await cookies();
-
-    const accessToken = cookieStore.get("accessToken")?.value || null;
-
-    if (!accessToken) {
-        // throw new Error("User Not Logged In!");
-
-        return {
-            success: false,
-            message: "User not logged in!"
-        }
-    }
+    const accessToken = await isAccessTokenExist();
 
     const res = await fetch(`${process.env.BACKEND_APP_URL}/api/posts/my-posts`, {
         headers: {
